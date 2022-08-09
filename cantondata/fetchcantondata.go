@@ -76,11 +76,6 @@ func getIncorrectCantonQuestionInfo(correctCantonAbbreviation string, incorrectC
 
 			// Check if canton is already taken
 			for _, alreadyTakenCantonAbbreviation := range takenCantonAbbreviations {
-
-				fmt.Println("//////////")
-				fmt.Println(fmt.Sprintf("cantonQuestionInfo.CantonAbbreviation: %s", cantonQuestionInfo.CantonAbbreviation))
-				fmt.Println(fmt.Sprintf("alreadyTakenCantonAbbreviation: %s", alreadyTakenCantonAbbreviation))
-
 				if cantonQuestionInfo.CantonAbbreviation == alreadyTakenCantonAbbreviation {
 					cantonAlreadyTaken = true
 				}

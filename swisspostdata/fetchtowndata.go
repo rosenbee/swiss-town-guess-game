@@ -63,8 +63,6 @@ func GetTown(bfsnr int, apiKey string) (townInfo *TownInfo, err error) {
 		return nil, errors.New("Could not read body from request")
 	}
 
-	fmt.Println(string(body))
-
 	var responseStruct SwissPostTownInfoResponse
 
 	err = json.Unmarshal(body, &responseStruct)

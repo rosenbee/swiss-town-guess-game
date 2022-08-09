@@ -1,15 +1,18 @@
 package main
 
 import (
+	"bufio"
 	"fmt"
 	"os"
+	"strconv"
+	"strings"
 
 	"golang.org/x/crypto/ssh/terminal"
 	cantondata "swiss-town-guess-game.com/swiss-town-guess-game/cantondata"
 	towndata "swiss-town-guess-game.com/swiss-town-guess-game/swisspostdata"
 )
 
-const QUESTIONS_PER_QUIZ = 3
+const QUESTIONS_PER_QUIZ = 5
 const INCORRECT_ANSWERS_PER_QUESTION = 2
 
 func main() {
@@ -29,9 +32,15 @@ func main() {
 
 	apiKey := string(apiKeyInputValue)
 
+	reader := bufio.NewReader(os.Stdin)
+
+	// Score
+	var correctAnswers, incorrectAnswers int
+
 	for i := 1; i <= QUESTIONS_PER_QUIZ; i++ {
 
 		// User info that first question is being prepared
+		fmt.Println("++++++++++++++++++++++++")
 		fmt.Println(fmt.Sprintf("Preparing Question %d. Please wait.", i))
 
 		// Get data of town with bfsnr
@@ -52,8 +61,6 @@ func main() {
 				os.Exit(1)
 			}
 		}
-
-		// Print town info
 		town := *townInfo
 
 		cantonQuestionInfoSetPointer, err := cantondata.GetCantonQuestionInfoSet(town.CantonCode, INCORRECT_ANSWERS_PER_QUESTION)
@@ -63,7 +70,56 @@ func main() {
 		}
 		cantonQuestionInfoSet := *cantonQuestionInfoSetPointer
 
-		fmt.Println(cantonQuestionInfoSet)
+		// Print question
+		fmt.Println(fmt.Sprintf("In which canton is %s?", town.Name))
 
+		// Print possible anwers
+		for i, cantonInfo := range cantonQuestionInfoSet.CantonQuestionInfos {
+			fmt.Println(fmt.Sprintf("Type %d for %s", (i + 1), cantonInfo.CantonName))
+		}
+
+		// Await answer
+		fmt.Print("Your answer: ")
+		answerString, err := reader.ReadString('\n')
+		if err != nil {
+			fmt.Println("An error occured while reading input. Please try again", err)
+			return
+		}
+		// Remove the delimiter from the string
+		answerString = strings.TrimSuffix(answerString, "\n")
+		answer, err := strconv.Atoi(answerString)
+
+		// Check if answer is a valid number
+		totalAnswers := INCORRECT_ANSWERS_PER_QUESTION + 1
+		if err != nil || answer < 1 || answer > totalAnswers {
+			fmt.Println(fmt.Sprintf("Type in a number from 1 to %d", totalAnswers))
+			fmt.Print("Your answer: ")
+			answerString, err = reader.ReadString('\n')
+			if err != nil || answer < 1 || answer > totalAnswers {
+				fmt.Println("Sorry, you are not qualified for this game. Good bye!")
+				os.Exit(1)
+			}
+		}
+
+		// Check if answer is correct
+		chosenAnswer := cantonQuestionInfoSet.CantonQuestionInfos[answer-1] // answer - 1, for index format
+		if chosenAnswer.CorrectAnswer {
+			fmt.Println("THAT WAS CORRECT!")
+			correctAnswers++
+		} else {
+			fmt.Println("SORRY, INCORRECT")
+			incorrectAnswers++
+		}
+		printScore(correctAnswers, incorrectAnswers)
 	}
+
+	fmt.Println("**************************************************************************************************************")
+	fmt.Println("* This game is over. Thank you for playing!                                                                  *")
+	fmt.Println("*                                                                                                            *")
+	fmt.Println(fmt.Sprintf("* You've got %d out of %d questions right!                                                                     *", correctAnswers, QUESTIONS_PER_QUIZ))
+	fmt.Println("**************************************************************************************************************")
+}
+
+func printScore(correctAnswers, incorrectAnswers int) {
+	fmt.Println(fmt.Sprintf("Your new Score is: %d correct answers, %d incorrect answers.", correctAnswers, incorrectAnswers))
 }

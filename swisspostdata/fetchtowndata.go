@@ -28,7 +28,6 @@ type SwissPostTownInfoResponseRecord struct {
 }
 
 type SwissPostTownInfoResponseFields struct {
-	BFSNr        int    `json:"bfsnr"`
 	GemeindeName string `json:"gemeindename"`
 	Kanton       string `json:"kanton"`
 }
@@ -39,12 +38,6 @@ func GetTown(bfsnr int, apiKey string) (townInfo *TownInfo, err error) {
 	url += fmt.Sprintf("%d", bfsnr)
 	url += "&limit=10&offset=0&timezone=UTC&apikey="
 	url += apiKey
-
-	/* perhaps needed
-	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	}
-	*/
 
 	tr := &http.Transport{}
 
@@ -70,15 +63,28 @@ func GetTown(bfsnr int, apiKey string) (townInfo *TownInfo, err error) {
 
 	fmt.Println(string(body))
 
-	var result SwissPostTownInfoResponse
+	var responseStruct SwissPostTownInfoResponse
 
-	err = json.Unmarshal(body, &result)
+	err = json.Unmarshal(body, &responseStruct)
 	if err != nil {
 		return nil, errors.New("Could not unmarshal the JSON structure")
 	}
 
-	fmt.Println(result)
+	if len(responseStruct.Records) > 1 {
+		return nil, errors.New("More than one record was found. This should not happen!")
+	}
 
-	// TODO
-	return nil, nil
+	if len(responseStruct.Records) == 0 {
+		// No record was found. This can happen and is not an error!
+		return nil, nil
+	}
+
+	var result TownInfo
+
+	// map to return value
+	// Through previous validations, we made sure that there is always one record available
+	result.CantonCode = responseStruct.Records[0].Record.Fields.Kanton
+	result.Name = responseStruct.Records[0].Record.Fields.GemeindeName
+
+	return &result, nil
 }

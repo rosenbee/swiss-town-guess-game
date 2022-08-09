@@ -8,6 +8,8 @@ import (
 	towndata "swiss-town-guess-game.com/swiss-town-guess-game/swisspostdata"
 )
 
+const QUESTIONS_PER_QUIZ = 3
+
 func main() {
 	fmt.Println("**************************************************************************************************************")
 	fmt.Println("* Welcome to the Swiss Town Guess Game!                                                                      *")
@@ -25,14 +27,22 @@ func main() {
 
 	apiKey := string(apiKeyInputValue)
 
-	fmt.Println("Key entered: ")
-	fmt.Println(apiKey)
+	for i := 1; i <= QUESTIONS_PER_QUIZ; i++ {
 
-	fmt.Println(towndata.HelloTest)
+		// Get random number between 1 and 770
+		// BFS numbers for Swiss towns are in that range
+		bfsnr := towndata.GetRandomSwissTownBFSNumber()
 
-	_, err = towndata.GetTown(1, apiKey)
-	if err != nil {
-		fmt.Println("/// error at towndata.GetTown happened")
-		fmt.Println(err)
+		// Get data of town with bfsnr
+		townInfo, err := towndata.GetTown(bfsnr, apiKey)
+		if err != nil {
+			fmt.Println("/// error at towndata.GetTown happened")
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		// Print town info
+		fmt.Println("//////// towninfo")
+		fmt.Println(*townInfo)
 	}
 }

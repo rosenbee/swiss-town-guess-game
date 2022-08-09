@@ -37,7 +37,7 @@ func GetCantonQuestionInfoSet(correctCantonAbbreviation string, incorrectAnswerC
 	cantonQuestionInfos.CantonQuestionInfos = append(cantonQuestionInfos.CantonQuestionInfos, correctCantonInfo)
 
 	// Add more random cantons (incorrect answers).
-	incorrectCantonQuestionInfosPointer, err := getIncorrectCantonQuestionInfo(correctCantonName, incorrectAnswerCount)
+	incorrectCantonQuestionInfosPointer, err := getIncorrectCantonQuestionInfo(correctCantonAbbreviation, incorrectAnswerCount)
 	if incorrectCantonQuestionInfosPointer == nil {
 		return nil, err
 	}

@@ -16,15 +16,23 @@ func main() {
 	fmt.Println("**************************************************************************************************************")
 
 	fmt.Printf("Please enter your valid swisspost.opendatasoft.com API-Key: ")
-	apiKey, err := terminal.ReadPassword(0)
+	apiKeyInputValue, err := terminal.ReadPassword(0)
 	if err != nil {
 		fmt.Println("Could not read api key")
 		os.Exit(1)
 	}
 	fmt.Println()
 
+	apiKey := string(apiKeyInputValue)
+
 	fmt.Println("Key entered: ")
-	fmt.Println(string(apiKey))
+	fmt.Println(apiKey)
 
 	fmt.Println(towndata.HelloTest)
+
+	_, err = towndata.GetTown(1, apiKey)
+	if err != nil {
+		fmt.Println("/// error at towndata.GetTown happened")
+		fmt.Println(err)
+	}
 }

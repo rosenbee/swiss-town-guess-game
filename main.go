@@ -73,7 +73,7 @@ func main() {
 		// Print question
 		fmt.Println(fmt.Sprintf("In which canton is %s?", town.Name))
 
-		// Print possible anwers
+		// Print possible answers
 		for i, cantonInfo := range cantonQuestionInfoSet.CantonQuestionInfos {
 			fmt.Println(fmt.Sprintf("Type %d for %s", (i + 1), cantonInfo.CantonName))
 		}

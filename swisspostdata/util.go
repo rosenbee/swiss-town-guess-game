@@ -5,6 +5,8 @@ import (
 	"time"
 )
 
+// Get random number between 1 and 770
+// BFS numbers for Swiss towns are in that range
 func GetRandomSwissTownBFSNumber() int {
 	rand.Seed(time.Now().UnixNano())
 	min := 1

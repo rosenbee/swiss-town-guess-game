@@ -10,6 +10,7 @@ import (
 )
 
 const QUESTIONS_PER_QUIZ = 3
+const INCORRECT_ANSWERS_PER_QUESTION = 2
 
 func main() {
 	fmt.Println("**************************************************************************************************************")
@@ -54,16 +55,15 @@ func main() {
 
 		// Print town info
 		town := *townInfo
-		cantonNamePointer := cantondata.GetCantonName(town.CantonCode)
-		if cantonNamePointer == nil {
-			fmt.Println(fmt.Sprintf("/// canton with abbreviation %s could not be found", town.CantonCode))
+
+		cantonQuestionInfoSetPointer, err := cantondata.GetCantonQuestionInfoSet(town.CantonCode, INCORRECT_ANSWERS_PER_QUESTION)
+		if err != nil {
+			fmt.Println("Could not generate canton question set!")
 			os.Exit(1)
 		}
-		cantonName := *cantonNamePointer
+		cantonQuestionInfoSet := *cantonQuestionInfoSetPointer
 
-		fmt.Println("//////// towninfo")
-		fmt.Println(town)
-		fmt.Println(cantonName)
+		fmt.Println(cantonQuestionInfoSet)
 
 	}
 }

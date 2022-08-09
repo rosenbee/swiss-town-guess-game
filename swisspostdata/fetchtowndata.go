@@ -32,6 +32,8 @@ type SwissPostTownInfoResponseFields struct {
 	Kanton       string `json:"kanton"`
 }
 
+// GetTown gets townInfo of specified bfsnr from the post.ch api.
+// If no townInfo was found for specified bfsnr, it will return nil.
 func GetTown(bfsnr int, apiKey string) (townInfo *TownInfo, err error) {
 
 	url := "https://swisspost.opendatasoft.com/api/v2/catalog/datasets/politische-gemeinden_v2/records?select=bfsnr%2Cgemeindename%2Ckanton&where=bfsnr%3D"

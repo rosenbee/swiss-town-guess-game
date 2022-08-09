@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"golang.org/x/crypto/ssh/terminal"
+	cantondata "swiss-town-guess-game.com/swiss-town-guess-game/cantondata"
 	towndata "swiss-town-guess-game.com/swiss-town-guess-game/swisspostdata"
 )
 
@@ -52,7 +53,17 @@ func main() {
 		}
 
 		// Print town info
+		town := *townInfo
+		cantonNamePointer := cantondata.GetCantonName(town.CantonCode)
+		if cantonNamePointer == nil {
+			fmt.Println(fmt.Sprintf("/// canton with abbreviation %s could not be found", town.CantonCode))
+			os.Exit(1)
+		}
+		cantonName := *cantonNamePointer
+
 		fmt.Println("//////// towninfo")
-		fmt.Println(*townInfo)
+		fmt.Println(town)
+		fmt.Println(cantonName)
+
 	}
 }

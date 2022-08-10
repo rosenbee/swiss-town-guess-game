@@ -36,12 +36,13 @@ func main() {
 
 	// Score
 	var correctAnswers, incorrectAnswers int
+	totalAnswers := INCORRECT_ANSWERS_PER_QUESTION + 1
 
 	for i := 1; i <= QUESTIONS_PER_QUIZ; i++ {
 
 		// User info that first question is being prepared
 		fmt.Println("++++++++++++++++++++++++")
-		fmt.Println(fmt.Sprintf("Preparing Question %d. Please wait.", i))
+		fmt.Println(fmt.Sprintf("Preparing Question %d. Please wait...", i))
 
 		// Get data of town with bfsnr
 		var townInfo *towndata.TownInfo
@@ -82,15 +83,15 @@ func main() {
 		fmt.Print("Your answer: ")
 		answerString, err := reader.ReadString('\n')
 		if err != nil {
-			fmt.Println("An error occured while reading input. Please try again", err)
-			return
+			fmt.Println("An error occured while reading input.", err)
+			os.Exit(1)
 		}
-		// Remove the delimiter from the string
+
+		// Remove the delimiter from input string
 		answerString = strings.TrimSuffix(answerString, "\n")
-		answer, err := strconv.Atoi(answerString)
 
 		// Check if answer is a valid number
-		totalAnswers := INCORRECT_ANSWERS_PER_QUESTION + 1
+		answer, err := strconv.Atoi(answerString)
 		if err != nil || answer < 1 || answer > totalAnswers {
 			fmt.Println(fmt.Sprintf("Type in a number from 1 to %d", totalAnswers))
 			fmt.Print("Your answer: ")

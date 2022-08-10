@@ -8,6 +8,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/patrickbucher/drawban"
 	"golang.org/x/crypto/ssh/terminal"
 	cantondata "swiss-town-guess-game.com/swiss-town-guess-game/cantondata"
 	towndata "swiss-town-guess-game.com/swiss-town-guess-game/swisspostdata"
@@ -19,11 +20,11 @@ const (
 )
 
 func main() {
-	fmt.Println("**************************************************************************************************************")
-	fmt.Println("* Welcome to the Swiss Town Guess Game!                                                                      *")
-	fmt.Println("*                                                                                                            *")
-	fmt.Println("* Thanks to post.ch / swisspost.opendatasoft.com / BFS for providing free data for this quiz.                *")
-	fmt.Println("**************************************************************************************************************")
+	welcomeBanner := drawban.DrawBanner([]string{
+		"Welcome to the Swiss Town Guess Game!",
+		"Thanks to post.ch / swisspost.opendatasoft.com / BFS for providing free data for this quiz.",
+	}, '*')
+	fmt.Println(strings.Join(welcomeBanner, "\n"))
 
 	var apiKey string
 	flag.StringVar(&apiKey, "apikey", "", "API Key for swisspost.opendatasoft.com")
@@ -123,11 +124,11 @@ func main() {
 		printScore(correctAnswers, incorrectAnswers)
 	}
 
-	fmt.Println("**************************************************************************************************************")
-	fmt.Println("* This game is over. Thank you for playing!                                                                  *")
-	fmt.Println("*                                                                                                            *")
-	fmt.Printf("* You've got %d out of %d questions right!                                                                     *\n", correctAnswers, QUESTIONS_PER_QUIZ)
-	fmt.Println("**************************************************************************************************************")
+	goodbyeBanner := drawban.DrawBanner([]string{
+		"This game is over. Thank you for playing!",
+		fmt.Sprintf("You've got %d out of %d questions right!", correctAnswers, QUESTIONS_PER_QUIZ),
+	}, '*')
+	fmt.Println(strings.Join(goodbyeBanner, "\n"))
 }
 
 func printScore(correctAnswers, incorrectAnswers int) {

@@ -8,8 +8,6 @@ import (
 	"net/http"
 )
 
-var HelloTest = "This is just a test"
-
 type TownInfo struct {
 	CantonCode string
 	Name       string

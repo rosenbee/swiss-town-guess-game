@@ -10,6 +10,6 @@ import (
 func GetRandomSwissTownBFSNumber() int {
 	rand.Seed(time.Now().UnixNano())
 	min := 1
-	max := 770
+	max := 6810 // highest BFSNR of a swiss town on 2022-08-12 according to: https://swisspost.opendatasoft.com/explore/dataset/politische-gemeinden_v2/table/?sort=bfsnr
 	return rand.Intn(max-min+1) + min
 }

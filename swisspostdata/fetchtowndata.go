@@ -11,8 +11,8 @@ import (
 var HelloTest = "This is just a test"
 
 type TownInfo struct {
-	CantonCode string `json:"success"`
-	Name       string `json:"statusCode"`
+	CantonCode string
+	Name       string
 }
 
 type SwissPostTownInfoResponse struct {

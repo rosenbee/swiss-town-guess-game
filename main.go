@@ -2,35 +2,44 @@ package main
 
 import (
 	"bufio"
+	"flag"
 	"fmt"
 	"os"
 	"strconv"
 	"strings"
 
+	"github.com/patrickbucher/drawban"
 	"golang.org/x/crypto/ssh/terminal"
 	cantondata "swiss-town-guess-game.com/swiss-town-guess-game/cantondata"
 	towndata "swiss-town-guess-game.com/swiss-town-guess-game/swisspostdata"
 )
 
-const QUESTIONS_PER_QUIZ = 5
-const INCORRECT_ANSWERS_PER_QUESTION = 2
+const (
+	QUESTIONS_PER_QUIZ             = 5
+	INCORRECT_ANSWERS_PER_QUESTION = 2
+)
 
 func main() {
-	fmt.Println("**************************************************************************************************************")
-	fmt.Println("* Welcome to the Swiss Town Guess Game!                                                                      *")
-	fmt.Println("*                                                                                                            *")
-	fmt.Println("* Thanks to post.ch / swisspost.opendatasoft.com / BFS for providing free data for this quiz.                *")
-	fmt.Println("**************************************************************************************************************")
+	welcomeBanner := drawban.DrawBanner([]string{
+		"Welcome to the Swiss Town Guess Game!",
+		"Thanks to post.ch / swisspost.opendatasoft.com / BFS for providing free data for this quiz.",
+	}, '*')
+	fmt.Println(strings.Join(welcomeBanner, "\n"))
 
-	fmt.Printf("Please enter your valid swisspost.opendatasoft.com API-Key: ")
-	apiKeyInputValue, err := terminal.ReadPassword(0)
-	if err != nil {
-		fmt.Println("Could not read api key")
-		os.Exit(1)
+	var apiKey string
+	flag.StringVar(&apiKey, "apikey", "", "API Key for swisspost.opendatasoft.com")
+	flag.Parse()
+
+	if apiKey == "" {
+		fmt.Printf("Please enter your valid swisspost.opendatasoft.com API-Key: ")
+		apiKeyInput, err := terminal.ReadPassword(0)
+		if err != nil {
+			fmt.Println("Could not read api key")
+			os.Exit(1)
+		}
+		fmt.Println()
+		apiKey = string(apiKeyInput)
 	}
-	fmt.Println()
-
-	apiKey := string(apiKeyInputValue)
 
 	reader := bufio.NewReader(os.Stdin)
 
@@ -42,7 +51,7 @@ func main() {
 
 		// User info that first question is being prepared
 		fmt.Println("++++++++++++++++++++++++")
-		fmt.Println(fmt.Sprintf("Preparing Question %d. Please wait...", i))
+		fmt.Printf("Preparing Question %d. Please wait...\n", i)
 
 		// Get data of town with bfsnr
 		var townInfo *towndata.TownInfo
@@ -55,12 +64,13 @@ func main() {
 			bfsnr := towndata.GetRandomSwissTownBFSNumber()
 
 			// Get towninfo from post.ch api
-			townInfo, err = towndata.GetTown(bfsnr, apiKey)
+			townInfoInput, err := towndata.GetTown(bfsnr, apiKey)
 			if err != nil {
 				fmt.Println("/// error at towndata.GetTown happened")
 				fmt.Println(err)
 				os.Exit(1)
 			}
+			townInfo = townInfoInput
 		}
 		town := *townInfo
 
@@ -72,11 +82,11 @@ func main() {
 		cantonQuestionInfoSet := *cantonQuestionInfoSetPointer
 
 		// Print question
-		fmt.Println(fmt.Sprintf("In which canton is %s?", town.Name))
+		fmt.Printf("In which canton is %s?\n", town.Name)
 
 		// Print possible answers
 		for i, cantonInfo := range cantonQuestionInfoSet.CantonQuestionInfos {
-			fmt.Println(fmt.Sprintf("Type %d for %s", (i + 1), cantonInfo.CantonName))
+			fmt.Printf("Type %d for %s\n", (i + 1), cantonInfo.CantonName)
 		}
 
 		// Await answer
@@ -93,7 +103,7 @@ func main() {
 		// Check if answer is a valid number
 		answer, err := strconv.Atoi(answerString)
 		if err != nil || answer < 1 || answer > totalAnswers {
-			fmt.Println(fmt.Sprintf("Type in a number from 1 to %d", totalAnswers))
+			fmt.Printf("Type in a number from 1 to %d\n", totalAnswers)
 			fmt.Print("Your answer: ")
 			answerString, err = reader.ReadString('\n')
 			if err != nil || answer < 1 || answer > totalAnswers {
@@ -114,13 +124,13 @@ func main() {
 		printScore(correctAnswers, incorrectAnswers)
 	}
 
-	fmt.Println("**************************************************************************************************************")
-	fmt.Println("* This game is over. Thank you for playing!                                                                  *")
-	fmt.Println("*                                                                                                            *")
-	fmt.Println(fmt.Sprintf("* You've got %d out of %d questions right!                                                                     *", correctAnswers, QUESTIONS_PER_QUIZ))
-	fmt.Println("**************************************************************************************************************")
+	goodbyeBanner := drawban.DrawBanner([]string{
+		"This game is over. Thank you for playing!",
+		fmt.Sprintf("You've got %d out of %d questions right!", correctAnswers, QUESTIONS_PER_QUIZ),
+	}, '*')
+	fmt.Println(strings.Join(goodbyeBanner, "\n"))
 }
 
 func printScore(correctAnswers, incorrectAnswers int) {
-	fmt.Println(fmt.Sprintf("Your new Score is: %d correct answers, %d incorrect answers.", correctAnswers, incorrectAnswers))
+	fmt.Printf("Your new Score is: %d correct answers, %d incorrect answers.\n", correctAnswers, incorrectAnswers)
 }
